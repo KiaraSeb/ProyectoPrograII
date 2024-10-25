@@ -11,7 +11,7 @@ public class UnidadController : ControllerBase {
     _unidadService = UnidadService;
   }
   [HttpGet]
-  public ActionResult<List<Unidad>> GetAllUnidads(){
+  public ActionResult<List<Unidad>> GetAllUnidades(){
 
     return Ok(_unidadService.GetAll());
   }
