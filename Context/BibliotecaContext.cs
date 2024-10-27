@@ -1,50 +1,69 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;;
 
-public class BibliotecaContext:DbContext
+public class ConquistadoresContext : DbContext
 {
-  public DbSet<Conquistador> Conquistadores {get; set;}
-  public DbSet<Club> Clubs {get; set;}
-  public DbSet<Unidad> Unidades {get; set;}
+    public DbSet<Persona> Personas { get; set; }
+    public DbSet<Unidad> Unidades { get; set; }
+    public DbSet<Especialidad> Especialidades { get; set; }
+    public DbSet<Rol> Roles { get; set; }
 
-    public BibliotecaContext(DbContextOptions<BibliotecaContext> options) : base(options)
+    public ConquistadoresContext(DbContextOptions<ConquistadoresContext> options) : base(options)
     {
 
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Conquistador>(entity =>
+        // Configuración para el modelo Persona
+        modelBuilder.Entity<Persona>(entity =>
         {
-          entity.Property(a => a.Nombre).IsRequired().HasMaxLength(100);
-          entity.Property(a => a.Apellido).IsRequired().HasMaxLength(100);
-        }
-        );
+            entity.Property(p => p.Nombre).IsRequired().HasMaxLength(100);
+            entity.Property(p => p.Tipo).IsRequired().HasMaxLength(50);
+            
+            // Relación entre Persona y Especialidades (uno a muchos)
+            entity.HasMany(p => p.EspecialidadesTerminadas)
+                  .WithMany()
+                  .UsingEntity(j => j.ToTable("PersonaEspecialidades"));
+        });
 
-        modelBuilder.Entity<Club>(entity =>
+        // Configuración para el modelo Unidad
+        modelBuilder.Entity<Unidad>(entity =>
         {
-          entity.Property(l => l.Titulo).IsRequired();
-          entity.Property(l => l.Paginas).IsRequired();
-          entity.Property(l => l.Ano).IsRequired();
-          entity.Property(l => l.Url_Portada).IsRequired(false);
+            entity.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
+            entity.Property(u => u.Clase).IsRequired().HasMaxLength(50);
 
-           entity.HasOne(l => l.Conquistador)
-           .WithMany(a => a.Clubs)
-           .HasForeignKey(l => l.ConquistadorId).IsRequired();
+            // Relación de Unidad con Personas (Conquistadores y Consejeros)
+            entity.HasMany(u => u.Conquistadores)
+                  .WithMany(p => p.Unidades)
+                  .UsingEntity(j => j.ToTable("UnidadConquistadores"));
 
-           entity.HasMany(l => l.Unidads)
-           .WithMany(t => t.Clubs)
-           .UsingEntity(j => j.ToTable("ClubUnidad") );
-           
-        }       
-        );
+            entity.HasMany(u => u.Consejeros)
+                  .WithMany(p => p.Unidades)
+                  .UsingEntity(j => j.ToTable("UnidadConsejeros"));
 
-        modelBuilder.Entity<Unidad>(entity => 
+            // Relación uno a uno para el director de la Unidad
+            entity.HasOne(u => u.Director)
+                  .WithMany()
+                  .HasForeignKey("DirectorId"); // Director es una persona
+        });
+
+        // Configuración para el modelo Especialidad
+        modelBuilder.Entity<Especialidad>(entity =>
         {
-          entity.Property(t => t.Nombre).IsRequired().HasMaxLength(50);
-        }
-        );
+            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Tipo).IsRequired().HasMaxLength(50);
+        });
 
-      
+        // Configuración para el modelo Rol
+        modelBuilder.Entity<Rol>(entity =>
+        {
+            entity.Property(r => r.Nombre).IsRequired().HasMaxLength(50);
+        });
 
+        // Relación entre Personas y Roles
+        modelBuilder.Entity<Persona>()
+            .HasOne(p => p.Rol)
+            .WithMany()
+            .HasForeignKey("RolId"); // Cada persona puede tener un rol
     }
-
-} 
+}

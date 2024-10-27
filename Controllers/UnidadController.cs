@@ -1,65 +1,53 @@
 using Microsoft.AspNetCore.Mvc;
-    
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 [ApiController]
-[Route("api/Unidades")]
-public class UnidadController : ControllerBase {
+[Route("api/[controller]")]
+public class UnidadController : ControllerBase
+{
+    private readonly IUnidadService _unidadService;
 
-  private readonly IUnidadService _unidadService;
-
-  public UnidadController(IUnidadService UnidadService)
-  {
-    _unidadService = UnidadService;
-  }
-  [HttpGet]
-  public ActionResult<List<Unidad>> GetAllUnidades(){
-
-    return Ok(_unidadService.GetAll());
-  }
-    
-  [HttpGet("{id}")]
-  public ActionResult<Unidad> GetById(int id)
-  {
-  Unidad? a = _unidadService.GetById(id);
-  if(a == null)
-  {
-    return NotFound("Unidad no Encotrado");
-  }
-  
-  return Ok(a);
-
-  }
-
-  [HttpPost]
-  public ActionResult<Unidad> NuevoUnidad(UnidadDTO a){
-    //Asigno el id al Unidad nuevo buscando el maximo id en la lista actual de Unidades y sumando 1
-    //a.Id = _unidadService.GetAll().Max(m => m.Id) + 1;
-    // Llamo al metodo Create del servicio de Unidad para dar de alta el nuevo Unidad
-    Unidad _a = _unidadService.Create(a);
-    //Devuelvo el resultado de llamar al metodo GetById pasando como parametro el Id del nuevo Unidad
-    return CreatedAtAction(nameof(GetById), new {id = _a.Id}, _a);
-  }
-
-  [HttpDelete("{id}")]
-  public ActionResult Delete(int id)
-  {
-    var a = _unidadService.GetById(id);
-
-    if (a == null)
-    { return NotFound("Unidad no encontrado!!!");}
-
-    _unidadService.Delete(id);
-    return NoContent();
-  }
-
-  [HttpPut("{id}")]
-  public ActionResult<Unidad> UpdateUnidad(int id, UnidadDTO updatedUnidad) {
-    
-    var Unidad = _unidadService.Update(id, updatedUnidad);
-
-    if (Unidad is null) {
-      return NotFound(); // Si no se encontró el Unidad, retorna 404 Not Found
+    public UnidadController(IUnidadService unidadService)
+    {
+        _unidadService = unidadService;
     }
-    return CreatedAtAction(nameof(GetById), new {id = Unidad.Id}, Unidad);
-  }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UnidadDTO>>> GetUnidades()
+    {
+        var unidades = await _unidadService.GetUnidadesAsync();
+        return Ok(unidades);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UnidadDTO>> GetUnidad(int id)
+    {
+        var unidad = await _unidadService.GetUnidadByIdAsync(id);
+        if (unidad == null) return NotFound();
+        return Ok(unidad);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<UnidadDTO>> CreateUnidad(UnidadDTO unidad)
+    {
+        var createdUnidad = await _unidadService.CreateUnidadAsync(unidad);
+        return CreatedAtAction(nameof(GetUnidad), new { id = createdUnidad.Id }, createdUnidad);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUnidad(int id, UnidadDTO unidad)
+    {
+        if (id != unidad.Id) return BadRequest();
+        await _unidadService.UpdateUnidadAsync(unidad);
+        return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUnidad(int id)
+    {
+        var deleted = await _unidadService.DeleteUnidadAsync(id);
+        if (!deleted) return NotFound();
+        return NoContent();
+    }
 }

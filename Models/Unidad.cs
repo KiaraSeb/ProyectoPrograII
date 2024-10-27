@@ -1,10 +1,9 @@
-using System.Text.Json.Serialization;
-
-public class Club
+public class Unidad
 {
-  public int Id {get; set;}
-  public string Nombre {get; set;}
-
-  [JsonIgnore]
-  public List<Club> Clubs {get; set;}   
+    public int Id { get; set; }
+    public string Nombre { get; set; }
+    public string Clase { get; set; }
+    
+    public List<Persona> Conquistadores { get; set; } = new List<Persona>();
+    public List<Persona> Consejeros { get; set; } = new List<Persona>();
 }

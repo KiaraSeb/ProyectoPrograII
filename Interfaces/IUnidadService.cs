@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 public interface IUnidadService
 {
-  public IEnumerable<Unidad> GetAll();
-  public Unidad? GetById(int id);
-  public Unidad Create(UnidadDTO a);
-
-  public void Delete(int id);
-  public Unidad? Update(int id, UnidadDTO a);
+    Task<IEnumerable<UnidadDTO>> GetUnidadesAsync();
+    Task<UnidadDTO> GetUnidadByIdAsync(int id);
+    Task<UnidadDTO> CreateUnidadAsync(UnidadDTO unidad);
+    Task<UnidadDTO> UpdateUnidadAsync(UnidadDTO unidad);
+    Task<bool> DeleteUnidadAsync(int id);
 }
