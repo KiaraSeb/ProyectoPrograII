@@ -1,9 +1,12 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization; // Para la autorización
+using Microsoft.AspNetCore.Mvc; // Para los atributos de controlador
+using System.Collections.Generic; // Para List<T>
+using YourNamespace.DTOs; // Cambia esto por el espacio de nombres correcto
+using YourNamespace.Models; // Cambia esto por el espacio de nombres correcto
 
 [ApiController]
-[Route("api/[controller]")]
+[Authorize]
+[Route("api/unidades")]
 public class UnidadController : ControllerBase
 {
     private readonly IUnidadService _unidadService;
@@ -14,40 +17,55 @@ public class UnidadController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UnidadDTO>>> GetUnidades()
+    public ActionResult<List<Unidad>> GetAllUnidades()
     {
-        var unidades = await _unidadService.GetUnidadesAsync();
-        return Ok(unidades);
+        return Ok(_unidadService.GetAll());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<UnidadDTO>> GetUnidad(int id)
+    public ActionResult<Unidad> GetById(int id)
     {
-        var unidad = await _unidadService.GetUnidadByIdAsync(id);
-        if (unidad == null) return NotFound();
+        var unidad = _unidadService.GetById(id);
+        if (unidad == null)
+        {
+            return NotFound("Unidad no encontrada");
+        }
         return Ok(unidad);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<UnidadDTO>> CreateUnidad(UnidadDTO unidad)
+    [HttpPost] // Este atributo debe estar presente
+    public ActionResult<Unidad> NuevoUnidad(UnidadDTO u)
     {
-        var createdUnidad = await _unidadService.CreateUnidadAsync(unidad);
-        return CreatedAtAction(nameof(GetUnidad), new { id = createdUnidad.Id }, createdUnidad);
+        var unidad = _unidadService.Create(u);
+        return CreatedAtAction(nameof(GetById), new { id = unidad.Id }, unidad);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUnidad(int id, UnidadDTO unidad)
+    [HttpPut("{id}")] // Atributo para la actualización
+    public ActionResult<Unidad> UpdateUnidad(int id, Unidad updatedUnidad)
     {
-        if (id != unidad.Id) return BadRequest();
-        await _unidadService.UpdateUnidadAsync(unidad);
-        return NoContent();
+        if (id != updatedUnidad.Id)
+        {
+            return BadRequest("El ID de la unidad en la URL no coincide con el ID de la unidad en el cuerpo de la solicitud.");
+        }
+        
+        var unidad = _unidadService.Update(id, updatedUnidad);
+        if (unidad == null)
+        {
+            return NotFound("Unidad no encontrada");
+        }
+        return Ok(unidad);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteUnidad(int id)
+    [HttpDelete("{id}")] // Atributo para la eliminación
+    public ActionResult Delete(int id)
     {
-        var deleted = await _unidadService.DeleteUnidadAsync(id);
-        if (!deleted) return NotFound();
+        var unidad = _unidadService.GetById(id);
+        if (unidad == null)
+        {
+            return NotFound("Unidad no encontrada");
+        }
+
+        _unidadService.Delete(id);
         return NoContent();
     }
 }

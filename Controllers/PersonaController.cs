@@ -1,10 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 [ApiController]
-[Route("api/[controller]")]
-public class PersonaController : ControllerBase
+[Authorize]
+[Route("api/personas")]
+public class PersonaController : ControllerBase 
 {
     private readonly IPersonaService _personaService;
 
@@ -14,40 +14,57 @@ public class PersonaController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PersonaDTO>>> GetPersonas()
+    public ActionResult<List<PersonaDTO>> GetAllPersonas()
     {
-        var personas = await _personaService.GetPersonasAsync();
-        return Ok(personas);
+        return Ok(_personaService.GetAll());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<PersonaDTO>> GetPersona(int id)
+    public ActionResult<PersonaDTO> GetById(int id)
     {
-        var persona = await _personaService.GetPersonaByIdAsync(id);
-        if (persona == null) return NotFound();
+        var persona = _personaService.GetById(id);
+        if (persona == null)
+        {
+            return NotFound("Persona no encontrada.");
+        }
+
         return Ok(persona);
     }
 
     [HttpPost]
-    public async Task<ActionResult<PersonaDTO>> CreatePersona(PersonaDTO persona)
+    public ActionResult<PersonaDTO> CrearPersona(PersonaDTO personaDto)
     {
-        var createdPersona = await _personaService.CreatePersonaAsync(persona);
-        return CreatedAtAction(nameof(GetPersona), new { id = createdPersona.Id }, createdPersona);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePersona(int id, PersonaDTO persona)
-    {
-        if (id != persona.Id) return BadRequest();
-        await _personaService.UpdatePersonaAsync(persona);
-        return NoContent();
+        var persona = _personaService.Create(personaDto);
+        return CreatedAtAction(nameof(GetById), new { id = persona.Id }, persona);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePersona(int id)
+    public ActionResult Delete(int id)
     {
-        var deleted = await _personaService.DeletePersonaAsync(id);
-        if (!deleted) return NotFound();
+        var persona = _personaService.GetById(id);
+        if (persona == null)
+        {
+            return NotFound("Persona no encontrada.");
+        }
+
+        _personaService.Delete(id);
         return NoContent();
+    }
+
+    [HttpPut("{id}")]
+    public ActionResult<PersonaDTO> UpdatePersona(int id, PersonaDTO updatedPersonaDto)
+    {
+        if (id != updatedPersonaDto.Id)
+        {
+            return BadRequest("El ID de la persona en la URL no coincide con el ID de la persona en el cuerpo de la solicitud.");
+        }
+
+        var persona = _personaService.Update(id, updatedPersonaDto);
+        if (persona == null)
+        {
+            return NotFound("Persona no encontrada.");
+        }
+
+        return CreatedAtAction(nameof(GetById), new { id = persona.Id }, persona);
     }
 }
