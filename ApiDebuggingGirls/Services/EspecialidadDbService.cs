@@ -2,60 +2,52 @@ using Microsoft.EntityFrameworkCore;
 
 public class EspecialidadDbService : IEspecialidadService
 {
-    private readonly BibliotecaContext _context;
+    private readonly BibliotecaContext _dbContext; // Asegúrate de reemplazar `YourDbContext` con el nombre real de tu DbContext
 
-    public EspecialidadDbService(BibliotecaContext context)
+    public EspecialidadDbService(BibliotecaContext dbContext)
     {
-        _context = context;
+        _dbContext = dbContext; // Inicializa el contexto de la base de datos
     }
 
     public IEnumerable<Especialidad> GetAll()
     {
-        return _context.Especialidades; // Asegúrate de que `Especialidades` es el DbSet correspondiente en `BibliotecaContext`
+        return _dbContext.Especialidades.ToList(); // Obtiene todas las especialidades
     }
 
     public Especialidad? GetById(int id)
     {
-        return _context.Especialidades.Find(id); // Busca por ID en la tabla de especialidades
+        return _dbContext.Especialidades
+            .FirstOrDefault(e => e.EspecialidadId == id); // Busca la especialidad por ID
     }
 
     public Especialidad Create(EspecialidadDTO especialidadDto)
     {
-        Especialidad especialidad = new Especialidad
+        var nuevaEspecialidad = new Especialidad
         {
             Nombre = especialidadDto.Nombre,
             Descripcion = especialidadDto.Descripcion
         };
-
-        _context.Especialidades.Add(especialidad);
-        _context.SaveChanges();
-        return especialidad;
+        _dbContext.Especialidades.Add(nuevaEspecialidad);
+        _dbContext.SaveChanges();
+        return nuevaEspecialidad;
     }
 
     public void Delete(int id)
     {
-        var especialidad = _context.Especialidades.Find(id);
+        var especialidad = _dbContext.Especialidades.Find(id);
         if (especialidad != null)
         {
-            _context.Especialidades.Remove(especialidad);
-            _context.SaveChanges();
+            _dbContext.Especialidades.Remove(especialidad);
+            _dbContext.SaveChanges();
         }
     }
 
     public Especialidad? Update(int id, Especialidad especialidad)
     {
-        var existingEspecialidad = _context.Especialidades.Find(id);
-        if (existingEspecialidad == null)
-        {
-            return null;
-        }
+        if (id != especialidad.EspecialidadId) return null;
 
-        // Actualiza las propiedades que corresponden
-        existingEspecialidad.Nombre = especialidad.Nombre;
-        existingEspecialidad.Descripcion = especialidad.Descripcion;
-
-        _context.Entry(existingEspecialidad).State = EntityState.Modified;
-        _context.SaveChanges();
-        return existingEspecialidad;
+        _dbContext.Entry(especialidad).State = EntityState.Modified;
+        _dbContext.SaveChanges();
+        return especialidad;
     }
 }

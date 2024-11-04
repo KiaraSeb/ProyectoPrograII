@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 [ApiController]
-[Authorize]
+//[Authorize]
+[AllowAnonymous]
 [Route("api/especialidades")]
 public class EspecialidadController : ControllerBase {
 
@@ -19,26 +21,29 @@ public class EspecialidadController : ControllerBase {
         return Ok(_especialidadService.GetAll());
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")] // Especifica que 'id' es un entero
     public ActionResult<Especialidad> GetById(int id)
     {
+        // Llama al servicio para obtener la especialidad por ID
         Especialidad? especialidad = _especialidadService.GetById(id);
         if (especialidad == null)
         {
             return NotFound("Especialidad no encontrada.");
         }
 
+        // Retorna el objeto de especialidad que incluye la Descripcion
         return Ok(especialidad);
-    }
+}
+
 
     [HttpPost]
     public ActionResult<Especialidad> NuevaEspecialidad(EspecialidadDTO especialidadDto)
     {
         Especialidad nuevaEspecialidad = _especialidadService.Create(especialidadDto);
-        return CreatedAtAction(nameof(GetById), new { id = nuevaEspecialidad.Id }, nuevaEspecialidad);
+        return CreatedAtAction(nameof(GetById), new { id = nuevaEspecialidad.EspecialidadId }, nuevaEspecialidad); // Cambiado de 'Id' a 'EspecialidadId'
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")] // Especifica que 'id' es un entero
     public ActionResult Delete(int id)
     {
         var especialidad = _especialidadService.GetById(id);
@@ -51,10 +56,10 @@ public class EspecialidadController : ControllerBase {
         return NoContent();
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")] // Especifica que 'id' es un entero
     public ActionResult<Especialidad> UpdateEspecialidad(int id, Especialidad updatedEspecialidad)
     {
-        if (id != updatedEspecialidad.Id)
+        if (id != updatedEspecialidad.EspecialidadId) // Cambiado de 'Id' a 'EspecialidadId'
         {
             return BadRequest("El ID de la especialidad en la URL no coincide con el ID en el cuerpo de la solicitud.");
         }
@@ -64,6 +69,6 @@ public class EspecialidadController : ControllerBase {
         {
             return NotFound();
         }
-        return CreatedAtAction(nameof(GetById), new { id = especialidad.Id }, especialidad);
+        return CreatedAtAction(nameof(GetById), new { id = especialidad.EspecialidadId }, especialidad); // Cambiado de 'Id' a 'EspecialidadId'
     }
 }
