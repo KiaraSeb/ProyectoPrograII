@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Configuración de la conexión a la base de datos
-var connectionString = builder.Configuration.GetConnectionString("cnBiblioteca");
+var connectionString = $"Data Source={Environment.GetEnvironmentVariable("SERVER_NAME")}; Initial Catalog=ConquistadoresDB; User ID={Environment.GetEnvironmentVariable("DB_USER")}; Password={Environment.GetEnvironmentVariable("DB_PASS")}; TrustServerCertificate=true";
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -45,7 +45,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();
