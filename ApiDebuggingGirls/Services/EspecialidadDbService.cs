@@ -2,22 +2,22 @@ using Microsoft.EntityFrameworkCore;
 
 public class EspecialidadDbService : IEspecialidadService
 {
-    private readonly BibliotecaContext _dbContext; // Asegúrate de reemplazar `YourDbContext` con el nombre real de tu DbContext
+    private readonly BibliotecaContext _dbContext;
 
     public EspecialidadDbService(BibliotecaContext dbContext)
     {
-        _dbContext = dbContext; // Inicializa el contexto de la base de datos
+        _dbContext = dbContext;
     }
 
     public IEnumerable<Especialidad> GetAll()
     {
-        return _dbContext.Especialidades.ToList(); // Obtiene todas las especialidades
+        return _dbContext.Especialidades.ToList();
     }
 
-    public Especialidad? GetById(int id)
+    public Especialidad? GetById(int especialidadId) // Cambiado a especialidadId
     {
         return _dbContext.Especialidades
-            .FirstOrDefault(e => e.EspecialidadId == id); // Busca la especialidad por ID
+            .FirstOrDefault(e => e.EspecialidadId == especialidadId);
     }
 
     public Especialidad Create(EspecialidadDTO especialidadDto)
@@ -25,16 +25,16 @@ public class EspecialidadDbService : IEspecialidadService
         var nuevaEspecialidad = new Especialidad
         {
             Nombre = especialidadDto.Nombre,
-            Descripcion = especialidadDto.Descripcion
+            Tipo = especialidadDto.Tipo
         };
         _dbContext.Especialidades.Add(nuevaEspecialidad);
         _dbContext.SaveChanges();
         return nuevaEspecialidad;
     }
 
-    public void Delete(int id)
+    public void Delete(int especialidadId) // Cambiado a especialidadId
     {
-        var especialidad = _dbContext.Especialidades.Find(id);
+        var especialidad = _dbContext.Especialidades.Find(especialidadId);
         if (especialidad != null)
         {
             _dbContext.Especialidades.Remove(especialidad);
@@ -42,9 +42,9 @@ public class EspecialidadDbService : IEspecialidadService
         }
     }
 
-    public Especialidad? Update(int id, Especialidad especialidad)
+    public Especialidad? Update(int especialidadId, Especialidad especialidad) // Cambiado a especialidadId
     {
-        if (id != especialidad.EspecialidadId) return null;
+        if (especialidadId != especialidad.EspecialidadId) return null;
 
         _dbContext.Entry(especialidad).State = EntityState.Modified;
         _dbContext.SaveChanges();

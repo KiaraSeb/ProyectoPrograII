@@ -16,30 +16,49 @@ public class BibliotecaContext : DbContext
         // Configuración para Clase
         modelBuilder.Entity<Clase>(entity =>
         {
-            entity.Property(c => c.Nombre).IsRequired().HasMaxLength(100);
-            entity.Property(c => c.Descripcion).IsRequired(false).HasMaxLength(200);
+            entity.Property(c => c.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(c => c.Descripcion)
+                .IsRequired(false)
+                .HasMaxLength(200);
         });
 
         // Configuración para Persona
         modelBuilder.Entity<Persona>(entity =>
         {
-            entity.Property(p => p.Nombre).IsRequired().HasMaxLength(100);
-            entity.Property(p => p.Apellido).IsRequired().HasMaxLength(100);
-            entity.Property(p => p.Email).IsRequired().HasMaxLength(100);
+            entity.Property(p => p.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(p => p.Apellido)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(p => p.Email)
+                .IsRequired()
+                .HasMaxLength(100);
         });
 
         // Configuración para Especialidad
         modelBuilder.Entity<Especialidad>(entity =>
         {
-            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Descripcion).IsRequired(false).HasMaxLength(200);
+            entity.HasKey(e => e.EspecialidadId); // Define Id como clave primaria
+            entity.Property(e => e.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.Tipo) // Cambia de Descripcion a Tipo
+                .IsRequired(false)
+                .HasMaxLength(200);
         });
 
         // Configuración para Unidad
         modelBuilder.Entity<Unidad>(entity =>
         {
-            entity.Property(u => u.Nombre).IsRequired().HasMaxLength(100);
-            entity.Property(u => u.Descripcion).IsRequired(false).HasMaxLength(200);
+            entity.Property(u => u.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(u => u.Descripcion)
+                .IsRequired(false)
+                .HasMaxLength(200);
         });
     }
 }

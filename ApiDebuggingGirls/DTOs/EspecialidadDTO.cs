@@ -6,5 +6,5 @@ public class EspecialidadDTO
     public string? Nombre { get; set; }
 
     [Required(ErrorMessage = "El campo Descripción es requerido.")]
-    public string? Descripcion { get; set; }
+    public string? Tipo { get; set; }
 }

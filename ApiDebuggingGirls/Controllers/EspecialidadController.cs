@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 [ApiController]
-//[Authorize]
 [AllowAnonymous]
 [Route("api/especialidades")]
-public class EspecialidadController : ControllerBase {
-
+public class EspecialidadController : ControllerBase
+{
     private readonly IEspecialidadService _especialidadService;
 
     public EspecialidadController(IEspecialidadService especialidadService)
@@ -21,54 +20,51 @@ public class EspecialidadController : ControllerBase {
         return Ok(_especialidadService.GetAll());
     }
 
-    [HttpGet("{id:int}")] // Especifica que 'id' es un entero
-    public ActionResult<Especialidad> GetById(int id)
+    [HttpGet("{especialidadId:int}")] // Cambiado a especialidadId
+    public ActionResult<Especialidad> GetById(int especialidadId)
     {
-        // Llama al servicio para obtener la especialidad por ID
-        Especialidad? especialidad = _especialidadService.GetById(id);
+        Especialidad? especialidad = _especialidadService.GetById(especialidadId);
         if (especialidad == null)
         {
             return NotFound("Especialidad no encontrada.");
         }
 
-        // Retorna el objeto de especialidad que incluye la Descripcion
         return Ok(especialidad);
-}
-
+    }
 
     [HttpPost]
     public ActionResult<Especialidad> NuevaEspecialidad(EspecialidadDTO especialidadDto)
     {
         Especialidad nuevaEspecialidad = _especialidadService.Create(especialidadDto);
-        return CreatedAtAction(nameof(GetById), new { id = nuevaEspecialidad.EspecialidadId }, nuevaEspecialidad); // Cambiado de 'Id' a 'EspecialidadId'
+        return CreatedAtAction(nameof(GetById), new { especialidadId = nuevaEspecialidad.EspecialidadId }, nuevaEspecialidad);
     }
 
-    [HttpDelete("{id:int}")] // Especifica que 'id' es un entero
-    public ActionResult Delete(int id)
+    [HttpDelete("{especialidadId}")]
+    public ActionResult Delete(int especialidadId) // Cambiado a especialidadId
     {
-        var especialidad = _especialidadService.GetById(id);
+        var especialidad = _especialidadService.GetById(especialidadId);
         if (especialidad == null)
         {
             return NotFound("Especialidad no encontrada.");
         }
 
-        _especialidadService.Delete(id);
+        _especialidadService.Delete(especialidadId);
         return NoContent();
     }
 
-    [HttpPut("{id:int}")] // Especifica que 'id' es un entero
-    public ActionResult<Especialidad> UpdateEspecialidad(int id, Especialidad updatedEspecialidad)
+    [HttpPut("{especialidadId}")]
+    public ActionResult<Especialidad> UpdateEspecialidad(int especialidadId, Especialidad updatedEspecialidad)
     {
-        if (id != updatedEspecialidad.EspecialidadId) // Cambiado de 'Id' a 'EspecialidadId'
+        if (especialidadId != updatedEspecialidad.EspecialidadId)
         {
             return BadRequest("El ID de la especialidad en la URL no coincide con el ID en el cuerpo de la solicitud.");
         }
 
-        var especialidad = _especialidadService.Update(id, updatedEspecialidad);
+        var especialidad = _especialidadService.Update(especialidadId, updatedEspecialidad);
         if (especialidad is null)
         {
             return NotFound();
         }
-        return CreatedAtAction(nameof(GetById), new { id = especialidad.EspecialidadId }, especialidad); // Cambiado de 'Id' a 'EspecialidadId'
+        return CreatedAtAction(nameof(GetById), new { especialidadId = especialidad.EspecialidadId }, especialidad);
     }
 }
