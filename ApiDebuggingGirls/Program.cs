@@ -67,9 +67,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // Configurar Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Establece los requisitos de contraseña aquí
+    options.Password.RequireDigit = true; // Requiere al menos un dígito
+    options.Password.RequireLowercase = true; // Requiere al menos una minúscula
+    options.Password.RequireUppercase = true; // Requiere al menos una mayúscula
+    options.Password.RequireNonAlphanumeric = true; // Requiere al menos un carácter no alfanumérico
+    options.Password.RequiredLength = 6; // Longitud mínima de 6 caracteres
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 // Configurar JWT para autenticación
 builder.Services.AddAuthentication(options =>

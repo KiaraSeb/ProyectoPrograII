@@ -16,11 +16,13 @@ public class AccountController : ControllerBase
     private readonly IConfiguration _configuration;
 
     public AccountController(
-        UserManager<ApplicationUser> userManager, 
-        SignInManager<ApplicationUser> signInManager, 
+        UserManager<ApplicationUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        SignInManager<ApplicationUser> signInManager,
         IConfiguration configuration)
     {
         _userManager = userManager;
+        _roleManager = roleManager;
         _signInManager = signInManager;
         _configuration = configuration;
     }
@@ -29,10 +31,15 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDTO model)
     {
+        if (model == null)
+        {
+            return BadRequest(new { Message = "El modelo no puede ser nulo" });
+        }
+
         var userExists = await _userManager.FindByNameAsync(model.Username);
         if (userExists != null)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "El usuario ya existe" });
+            return Conflict(new { Message = "El usuario ya existe" });
         }
 
         var user = new ApplicationUser
@@ -45,7 +52,7 @@ public class AccountController : ControllerBase
         var result = await _userManager.CreateAsync(user, model.Password);
         if (!result.Succeeded)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Error al crear usuario" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Error al crear usuario", Errors = result.Errors });
         }
 
         return Ok(new { Message = "Usuario creado satisfactoriamente" });
@@ -53,13 +60,17 @@ public class AccountController : ControllerBase
 
     // Login de usuarios y generación de JWT
     [HttpPost("login")]
-     public async Task<IActionResult> Login([FromBody] LoginDTO model)
+    public async Task<IActionResult> Login([FromBody] LoginDTO model)
     {
+        if (model == null)
+        {
+            return BadRequest(new { Message = "El modelo no puede ser nulo" });
+        }
+
         var user = await _userManager.FindByNameAsync(model.Username);
         if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
         {
             var userRoles = await _userManager.GetRolesAsync(user);
-
             var authClaims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
@@ -88,21 +99,32 @@ public class AccountController : ControllerBase
                 expiration = token.ValidTo
             });
         }
-        return Unauthorized();
+        return Unauthorized(new { Message = "Credenciales no válidas" });
     }
 
     // Asignar un rol a un usuario
     [HttpPost("asignar-rol")]
     public async Task<IActionResult> AsignarRol([FromBody] RoleAssignmentDTO model)
     {
+        if (model == null)
+        {
+            return BadRequest(new { Message = "El modelo no puede ser nulo" });
+        }
+
         var user = await _userManager.FindByNameAsync(model.Username);
         if (user == null)
         {
             return NotFound(new { Message = "Usuario no encontrado" });
         }
 
-        var roleExists = await _userManager.IsInRoleAsync(user, model.Role);
-        if (roleExists)
+        var roleExists = await _roleManager.RoleExistsAsync(model.Role);
+        if (!roleExists)
+        {
+            return NotFound(new { Message = "El rol no existe" });
+        }
+
+        var isInRole = await _userManager.IsInRoleAsync(user, model.Role);
+        if (isInRole)
         {
             return BadRequest(new { Message = "El usuario ya tiene este rol" });
         }
@@ -113,57 +135,59 @@ public class AccountController : ControllerBase
             return Ok(new { Message = "Rol asignado correctamente" });
         }
 
-        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Error al asignar el rol" });
+        return StatusCode(StatusCodes.Status500InternalServerError, new { Message = "Error al asignar el rol", Errors = result.Errors });
     }
 
     [HttpGet("roles")]
-        public async Task<IActionResult> GetRoles(){
-            List<IdentityRole> roles = await _roleManager.Roles.ToListAsync();
+    public async Task<IActionResult> GetRoles()
+    {
+        var roles = await _roleManager.Roles.ToListAsync();
+        return Ok(roles);
+    }
+
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        return Ok(users);
+    }
+
+    [HttpGet("users/{id}/roles")]
+    public async Task<IActionResult> GetRolesByUserId(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user != null)
+        {
+            IList<string> roles = await _userManager.GetRolesAsync(user);
             return Ok(roles);
         }
+        return NotFound(new { Message = "Usuario no encontrado" });
+    }
 
-        [HttpGet("users")]
-        public async Task<IActionResult> GetUsers(){
-            List<ApplicationUser> users = await _userManager.Users.ToListAsync();
-            return Ok(users);
-        }
-
-        [HttpGet("/users/{id}/roles")]
-        public async Task<IActionResult> GetRoles(string id)
+    [HttpPost("role")]
+    public async Task<IActionResult> CreateRole([FromBody] string roleName)
+    {
+        if (string.IsNullOrWhiteSpace(roleName))
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user != null)
-            {
-                IList<string> roles = await _userManager.GetRolesAsync(user);
-                return Ok(roles);
-            }
-            return BadRequest();
+            return BadRequest("El nombre del rol no puede estar vacío.");
         }
 
-        [HttpPost("role")]
-        public async Task<IActionResult> CreateRole([FromBody] string roleName)
+        // Verifica si el rol ya existe
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+        if (roleExists)
         {
-            if (string.IsNullOrWhiteSpace(roleName))
-            {
-                return BadRequest("El nombre del rol no puede estar vacío.");
-            }
-
-            // Verifica si el rol ya existe
-            var roleExists = await _roleManager.RoleExistsAsync(roleName);
-            if (roleExists)
-            {
-                return Conflict($"El rol '{roleName}' ya existe.");
-            }
-
-            // Crea un nuevo rol
-            var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
-
-            if (result.Succeeded)
-            {
-                return Ok($"El rol '{roleName}' ha sido creado exitosamente.");
-            }
-
-            // Si algo falla, devuelve los errores
-            return BadRequest(result.Errors);
+            return Conflict($"El rol '{roleName}' ya existe.");
         }
+
+        // Crea un nuevo rol
+        var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+        if (result.Succeeded)
+        {
+            return Ok($"El rol '{roleName}' ha sido creado exitosamente.");
+        }
+
+        // Si algo falla, devuelve los errores
+        return BadRequest(new { Message = "Error al crear el rol", Errors = result.Errors });
+    }
 }
