@@ -1,9 +1,9 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 // Se agrega nuestro pequeño script para cargar las envs del archivo .env
 var root = Directory.GetCurrentDirectory();
@@ -15,20 +15,43 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregamos los controladores
 builder.Services.AddControllers();
 
-// Se crea la cadena de conexión a partir de las variables de sistema.
+// Configuración de la conexión a la base de datos
 var connectionString = builder.Configuration.GetConnectionString("cnBiblioteca");
-connectionString = connectionString.Replace("SERVER_NAME", builder.Configuration["SERVER_NAME"]);
-connectionString = connectionString.Replace("DB_USER", builder.Configuration["DB_USER"]);
-connectionString = connectionString.Replace("DB_PASS", builder.Configuration["DB_PASS"]);
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// Configurar Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configurar JWT
+// Agregar el uso de JWT
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // Configuración básica de Swagger
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Tu API", Version = "v1" });
-
-    // Configuración de seguridad para JWT
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -55,50 +78,6 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configurar el contexto de la base de datos
-builder.Services.AddSqlServer<BibliotecaContext>(connectionString);
-builder.Services.AddScoped<IPersonaService, PersonaDbService>();
-builder.Services.AddScoped<IEspecialidadService, EspecialidadDbService>();
-builder.Services.AddScoped<IUnidadService, UnidadDbService>();
-builder.Services.AddScoped<IClaseService, ClaseDbService>();
-
-// Configurar el contexto para Identity (autenticación y autorización)
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-// Configurar Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    // Establece los requisitos de contraseña aquí
-    options.Password.RequireDigit = true; // Requiere al menos un dígito
-    options.Password.RequireLowercase = true; // Requiere al menos una minúscula
-    options.Password.RequireUppercase = true; // Requiere al menos una mayúscula
-    options.Password.RequireNonAlphanumeric = true; // Requiere al menos un carácter no alfanumérico
-    options.Password.RequiredLength = 6; // Longitud mínima de 6 caracteres
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
-
-// Configurar JWT para autenticación
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -109,7 +88,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // Añadir autenticación
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
