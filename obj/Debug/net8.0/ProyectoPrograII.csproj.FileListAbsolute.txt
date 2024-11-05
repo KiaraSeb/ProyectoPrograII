@@ -1,5 +1,0 @@
-C:\Users\Usuario\OneDrive - uap.edu.ar\Escritorio\ProyectoPrograII\obj\Debug\net8.0\ProyectoPrograII.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\Usuario\OneDrive - uap.edu.ar\Escritorio\ProyectoPrograII\obj\Debug\net8.0\ProyectoPrograII.AssemblyInfoInputs.cache
-C:\Users\Usuario\OneDrive - uap.edu.ar\Escritorio\ProyectoPrograII\obj\Debug\net8.0\ProyectoPrograII.AssemblyInfo.cs
-C:\Users\Usuario\OneDrive - uap.edu.ar\Escritorio\ProyectoPrograII\obj\Debug\net8.0\ProyectoPrograII.csproj.CoreCompileInputs.cache
-C:\Users\Usuario\OneDrive - uap.edu.ar\Escritorio\ProyectoPrograII\obj\Debug\net8.0\ProyectoPrograII.sourcelink.json
