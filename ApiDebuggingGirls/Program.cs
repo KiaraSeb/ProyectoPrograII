@@ -26,7 +26,6 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 // Configurar JWT
-// Agregar el uso de JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -45,6 +44,11 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
+
+// Registrar servicios para Especialidad, Clase y Unidad
+builder.Services.AddScoped<IEspecialidadService, EspecialidadDbService>();
+builder.Services.AddScoped<IClaseService, ClaseDbService>();
+builder.Services.AddScoped<IUnidadService, UnidadDbService>();
 
 // Configuración de Swagger
 builder.Services.AddEndpointsApiExplorer();

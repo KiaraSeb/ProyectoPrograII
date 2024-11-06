@@ -43,8 +43,16 @@ public class ClaseDbService : IClaseService
 
     public Clase? Update(int id, Clase c)
     {
-        _context.Entry(c).State = EntityState.Modified;
+        var existingClase = _context.Clases.Find(id);
+        if (existingClase == null)
+        {
+            return null;
+        }
+
+        existingClase.Nombre = c.Nombre;
+        existingClase.Descripcion = c.Descripcion;
         _context.SaveChanges();
-        return c;
+        return existingClase;
     }
+
 }
