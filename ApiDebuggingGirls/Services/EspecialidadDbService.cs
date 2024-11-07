@@ -14,10 +14,10 @@ public class EspecialidadDbService : IEspecialidadService
         return _dbContext.Especialidades.ToList();
     }
 
-    public Especialidad? GetById(int especialidadId) // Cambiado a especialidadId
+    public Especialidad? GetById(int EspecialidadId) 
     {
         return _dbContext.Especialidades
-            .FirstOrDefault(e => e.EspecialidadId == especialidadId);
+            .FirstOrDefault(e => e.EspecialidadId == EspecialidadId);
     }
 
     public Especialidad Create(EspecialidadDTO especialidadDto)
@@ -32,9 +32,9 @@ public class EspecialidadDbService : IEspecialidadService
         return nuevaEspecialidad;
     }
 
-    public void Delete(int especialidadId) // Cambiado a especialidadId
+    public void Delete(int EspecialidadId) 
     {
-        var especialidad = _dbContext.Especialidades.Find(especialidadId);
+        var especialidad = _dbContext.Especialidades.Find(EspecialidadId);
         if (especialidad != null)
         {
             _dbContext.Especialidades.Remove(especialidad);
@@ -42,9 +42,9 @@ public class EspecialidadDbService : IEspecialidadService
         }
     }
 
-    public Especialidad? Update(int especialidadId, Especialidad especialidad) // Cambiado a especialidadId
+    public Especialidad? Update(int EspecialidadId, Especialidad especialidad) 
     {
-        if (especialidadId != especialidad.EspecialidadId) return null;
+        if (EspecialidadId != especialidad.EspecialidadId) return null;
 
         _dbContext.Entry(especialidad).State = EntityState.Modified;
         _dbContext.SaveChanges();

@@ -3,12 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 public class Especialidad
 {
-    [Column("EspecialidadId")] // Mapea esta propiedad a la columna EspecialidadId en la base de datos
-    public int EspecialidadId { get; set; } // Cambiado a EspecialidadId para reflejar la clave primaria
+    public int EspecialidadId { get; set; } 
 
     public string? Nombre { get; set; }
 
-    [Column("Tipo")] // Mapea a la columna Tipo en lugar de Descripcion
     public string? Tipo { get; set; }
     
     [JsonIgnore]
@@ -19,9 +17,9 @@ public class Especialidad
         Personas = new List<Persona>();
     }
 
-    public Especialidad(int especialidadId, string nombre, string tipo)
+    public Especialidad(int EspecialidadId, string nombre, string tipo)
     {
-        EspecialidadId = especialidadId;
+        EspecialidadId = EspecialidadId;
         Nombre = nombre;
         Tipo = tipo;
         Personas = new List<Persona>();

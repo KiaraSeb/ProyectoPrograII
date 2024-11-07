@@ -38,7 +38,7 @@ public class BibliotecaContext : DbContext
         // Configuración para Especialidad
         modelBuilder.Entity<Especialidad>(entity =>
         {
-            entity.HasKey(e => e.EspecialidadId); // Define Id como clave primaria
+            entity.HasKey(e => e.EspecialidadId); 
             entity.Property(e => e.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);

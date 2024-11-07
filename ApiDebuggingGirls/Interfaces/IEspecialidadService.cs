@@ -1,8 +1,8 @@
 public interface IEspecialidadService
 {
     IEnumerable<Especialidad> GetAll();
-    Especialidad? GetById(int especialidadId);
+    Especialidad? GetById(int EspecialidadId);
     Especialidad Create(EspecialidadDTO especialidadDto);
-    void Delete(int especialidadId);
-    Especialidad? Update(int especialidadId, Especialidad especialidad);
+    void Delete(int EspecialidadId);
+    Especialidad? Update(int EspecialidadId, Especialidad especialidad);
 }

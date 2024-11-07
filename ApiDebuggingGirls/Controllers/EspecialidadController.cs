@@ -19,11 +19,11 @@ public class EspecialidadController : ControllerBase
         return Ok(especialidades);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{EspecialidadId}")]
     [Authorize]
-    public IActionResult GetEspecialidadById(int id)
+    public IActionResult GetEspecialidadById(int EspecialidadId)
     {
-        var especialidad = _especialidadService.GetById(id);
+        var especialidad = _especialidadService.GetById(EspecialidadId);
         if (especialidad == null)
         {
             return NotFound();
@@ -36,22 +36,22 @@ public class EspecialidadController : ControllerBase
     public IActionResult CreateEspecialidad([FromBody] EspecialidadDTO especialidadDto)
     {
         var especialidad = _especialidadService.Create(especialidadDto);
-        return CreatedAtAction(nameof(GetEspecialidadById), new { id = especialidad.EspecialidadId }, especialidad);
+        return CreatedAtAction(nameof(GetEspecialidadById), new { EspecialidadId = especialidad.EspecialidadId }, especialidad);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{EspecialidadId}")]
     [Authorize]
-    public IActionResult DeleteEspecialidad(int id)
+    public IActionResult DeleteEspecialidad(int EspecialidadId)
     {
-        _especialidadService.Delete(id);
+        _especialidadService.Delete(EspecialidadId);
         return NoContent();
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{EspecialidadId}")]
     [Authorize]
-    public IActionResult UpdateEspecialidad(int id, [FromBody] Especialidad especialidad)
+    public IActionResult UpdateEspecialidad(int EspecialidadId, [FromBody] Especialidad especialidad)
     {
-        var updatedEspecialidad = _especialidadService.Update(id, especialidad);
+        var updatedEspecialidad = _especialidadService.Update(EspecialidadId, especialidad);
         if (updatedEspecialidad == null)
         {
             return NotFound();
