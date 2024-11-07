@@ -53,9 +53,6 @@ public class BibliotecaContext : DbContext
             entity.Property(u => u.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(u => u.Descripcion)
-                .IsRequired(false)
-                .HasMaxLength(200);
         });
     }
 }

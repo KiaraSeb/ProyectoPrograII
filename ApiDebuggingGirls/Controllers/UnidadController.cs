@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Authorize]
 [Route("api/unidades")]
-public class UnidadController : ControllerBase {
-
+public class UnidadController : ControllerBase
+{
     private readonly IUnidadService _unidadService;
 
     public UnidadController(IUnidadService unidadService)
@@ -19,51 +19,37 @@ public class UnidadController : ControllerBase {
         return Ok(_unidadService.GetAll());
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Unidad> GetById(int id)
+    [HttpGet("{UnidadId}")]
+    public ActionResult<Unidad> GetById(int UnidadId)
     {
-        Unidad? unidad = _unidadService.GetById(id);
-        if (unidad == null)
-        {
-            return NotFound("Unidad no encontrada.");
-        }
-
-        return Ok(unidad);
+        var unidad = _unidadService.GetById(UnidadId);
+        return unidad == null ? NotFound("Unidad no encontrada.") : Ok(unidad);
     }
 
     [HttpPost]
     public ActionResult<Unidad> NuevaUnidad(UnidadDTO unidadDto)
     {
-        Unidad nuevaUnidad = _unidadService.Create(unidadDto);
-        return CreatedAtAction(nameof(GetById), new { id = nuevaUnidad.Id }, nuevaUnidad);
+        var nuevaUnidad = _unidadService.Create(unidadDto);
+        return CreatedAtAction(nameof(GetById), new { UnidadId = nuevaUnidad.UnidadId }, nuevaUnidad);
     }
 
-    [HttpDelete("{id}")]
-    public ActionResult Delete(int id)
+    [HttpPut("{UnidadId}")]
+    public ActionResult<Unidad> UpdateUnidad(int UnidadId, UnidadDTO updatedUnidad)
     {
-        var unidad = _unidadService.GetById(id);
-        if (unidad == null)
+        var unidad = _unidadService.Update(UnidadId, updatedUnidad);
+        return unidad == null ? NotFound() : CreatedAtAction(nameof(GetById), new { UnidadId = unidad.UnidadId }, unidad);
+    }
+
+    [HttpDelete("{UnidadId}")]
+    public ActionResult Delete(int UnidadId)
+    {
+        if (!_unidadService.Delete(UnidadId))
         {
             return NotFound("Unidad no encontrada.");
         }
-
-        _unidadService.Delete(id);
         return NoContent();
     }
 
-    [HttpPut("{id}")]
-    public ActionResult<Unidad> UpdateUnidad(int id, Unidad updatedUnidad)
-    {
-        if (id != updatedUnidad.Id)
-        {
-            return BadRequest("El ID de la unidad en la URL no coincide con el ID en el cuerpo de la solicitud.");
-        }
-
-        var unidad = _unidadService.Update(id, updatedUnidad);
-        if (unidad is null)
-        {
-            return NotFound();
-        }
-        return CreatedAtAction(nameof(GetById), new { id = unidad.Id }, unidad);
-    }
 }
+
+

@@ -2,28 +2,29 @@ using System.Text.Json.Serialization;
 
 public class Unidad
 {
-    public int Id { get; set; }
+    public int UnidadId { get; set; }
     public string? Nombre { get; set; }
-    public string? Descripcion { get; set; }
     
-    [JsonIgnore]
-    public virtual List<Clase> Clases { get; set; }
+    // Clave foránea hacia Clase
+    public int ClaseId { get; set; }
+
+    // Propiedad de navegación para la relación con Clase
+    public Clase Clase { get; set; } 
 
     public Unidad()
     {
-        Clases = new List<Clase>();
+        // Constructor vacío
     }
 
-    public Unidad(int id, string nombre, string descripcion)
+    public Unidad(int unidadId, string nombre, int claseId)
     {
-        Id = id;
+        UnidadId = unidadId;
         Nombre = nombre;
-        Descripcion = descripcion;
-        Clases = new List<Clase>();
+        ClaseId = claseId;
     }
 
-    override public string ToString()
+    public override string ToString()
     {
-        return $"Id:{Id}, Nombre:{Nombre}, Descripción:{Descripcion}";
+        return $"UnidadId:{UnidadId}, Nombre:{Nombre}, ClaseId:{ClaseId}";
     }
 }

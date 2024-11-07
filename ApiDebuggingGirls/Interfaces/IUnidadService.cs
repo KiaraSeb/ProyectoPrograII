@@ -1,8 +1,8 @@
 public interface IUnidadService
 {
     IEnumerable<Unidad> GetAll();
-    Unidad? GetById(int id);
+    Unidad? GetById(int UnidadId);
     Unidad Create(UnidadDTO unidadDto);
-    void Delete(int id);
-    Unidad? Update(int id, Unidad unidad);
+    bool Delete(int UnidadId); // Cambiar a bool
+    Unidad? Update(int UnidadId, UnidadDTO unidadDto);
 }
