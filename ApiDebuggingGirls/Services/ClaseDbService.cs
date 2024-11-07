@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 public class ClaseDbService : IClaseService
 {
@@ -14,45 +15,44 @@ public class ClaseDbService : IClaseService
         Clase clase = new()
         {
             Nombre = c.Nombre,
-            Descripcion = c.Descripcion
         };
         _context.Clases.Add(clase);
         _context.SaveChanges();
         return clase;
     }
 
-    public void Delete(int id)
+    public bool Delete(int ClaseId)
     {
-        var c = _context.Clases.Find(id);
+        var c = _context.Clases.Find(ClaseId);
         if (c != null)
         {
             _context.Clases.Remove(c);
             _context.SaveChanges();
+            return true;
         }
+        return false;
     }
 
-    public IEnumerable<Clase> GetAll()
+    public List<Clase> GetAll()
     {
-        return _context.Clases;
+        return _context.Clases.ToList();
     }
 
-    public Clase? GetById(int id)
+    public Clase? GetById(int ClaseId)
     {
-        return _context.Clases.Find(id);
+        return _context.Clases.Find(ClaseId);
     }
 
-    public Clase? Update(int id, Clase c)
+    public Clase? Update(int ClaseId, ClaseDTO c)
     {
-        var existingClase = _context.Clases.Find(id);
+        var existingClase = _context.Clases.Find(ClaseId);
         if (existingClase == null)
         {
             return null;
         }
 
         existingClase.Nombre = c.Nombre;
-        existingClase.Descripcion = c.Descripcion;
         _context.SaveChanges();
         return existingClase;
     }
-
 }

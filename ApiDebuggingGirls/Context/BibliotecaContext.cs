@@ -19,9 +19,6 @@ public class BibliotecaContext : DbContext
             entity.Property(c => c.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(c => c.Descripcion)
-                .IsRequired(false)
-                .HasMaxLength(200);
         });
 
         // Configuración para Persona

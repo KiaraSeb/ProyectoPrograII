@@ -1,8 +1,10 @@
+using System.Collections.Generic;
+
 public interface IClaseService
 {
-    IEnumerable<Clase> GetAll();
-    Clase? GetById(int id);
+    List<Clase> GetAll();
+    Clase GetById(int ClaseId);
     Clase Create(ClaseDTO claseDto);
-    void Delete(int id);
-    Clase? Update(int id, Clase clase);
+    Clase Update(int ClaseId, ClaseDTO claseDto);
+    bool Delete(int ClaseId);
 }

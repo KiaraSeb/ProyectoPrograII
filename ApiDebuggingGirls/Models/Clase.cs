@@ -2,9 +2,8 @@ using System.Text.Json.Serialization;
 
 public class Clase
 {
-    public int Id { get; set; }
+    public int ClaseId { get; set; }
     public string? Nombre { get; set; }
-    public string? Descripcion { get; set; }
     
     [JsonIgnore]
     public virtual List<Unidad> Unidades { get; set; }
@@ -14,16 +13,15 @@ public class Clase
         Unidades = new List<Unidad>();
     }
 
-    public Clase(int id, string nombre, string descripcion)
+    public Clase(int ClaseId, string nombre)
     {
-        Id = id;
+        ClaseId = ClaseId;
         Nombre = nombre;
-        Descripcion = descripcion;
         Unidades = new List<Unidad>();
     }
 
     override public string ToString()
     {
-        return $"Id:{Id}, Nombre:{Nombre}, Descripción:{Descripcion}";
+        return $"ClaseId:{ClaseId}, Nombre:{Nombre}";
     }
 }

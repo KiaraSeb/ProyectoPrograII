@@ -1,11 +1,10 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 [ApiController]
-[Authorize]
 [Route("api/clases")]
-public class ClaseController : ControllerBase {
-
+public class ClaseController : ControllerBase
+{
     private readonly IClaseService _claseService;
 
     public ClaseController(IClaseService claseService)
@@ -14,56 +13,56 @@ public class ClaseController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<List<Clase>> GetAllClases()
+    public ActionResult<List<Clase>> GetAll()
     {
-        return Ok(_claseService.GetAll());
+        try
+        {
+            return Ok(_claseService.GetAll());
+        }
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return Problem(detail: e.Message, statusCode: 500);
+        }
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Clase> GetById(int id)
+    [HttpGet("{ClaseId}")]
+    public ActionResult<Clase> GetById(int ClaseId)
     {
-        Clase? clase = _claseService.GetById(id);
-        if (clase == null)
-        {
-            return NotFound("Clase no encontrada.");
-        }
-
+        Clase? clase = _claseService.GetById(ClaseId);
+        if (clase is null) return NotFound();
         return Ok(clase);
     }
 
     [HttpPost]
-    public ActionResult<Clase> NuevaClase(ClaseDTO claseDto)
+    public ActionResult<Clase> NuevaClase(ClaseDTO c)
     {
-        Clase nuevaClase = _claseService.Create(claseDto);
-        return CreatedAtAction(nameof(GetById), new { id = nuevaClase.Id }, nuevaClase);
+        Clase clase = _claseService.Create(c);
+        return CreatedAtAction(nameof(GetById), new { ClaseId = clase.ClaseId }, clase);
     }
 
-    [HttpDelete("{id}")]
-    public ActionResult Delete(int id)
+    [HttpPut("{ClaseId}")]
+    public ActionResult<Clase> Update(int ClaseId, ClaseDTO c)
     {
-        var clase = _claseService.GetById(id);
-        if (clase == null)
+        try
         {
-            return NotFound("Clase no encontrada.");
+            Clase clase = _claseService.Update(ClaseId, c);
+            if (clase is null) return NotFound(new { Message = $"No se pudo actualizar la clase con ClaseId: {ClaseId}" });
+            return CreatedAtAction(nameof(GetById), new { ClaseId = clase.ClaseId }, clase);
         }
-
-        _claseService.Delete(id);
-        return NoContent();
+        catch (System.Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return Problem(detail: e.Message, statusCode: 500);
+        }
     }
 
-    [HttpPut("{id}")]
-    public ActionResult<Clase> UpdateClase(int id, Clase updatedClase)
+    [HttpDelete("{ClaseId}")]
+    public ActionResult Delete(int ClaseId)
     {
-        if (id != updatedClase.Id)
-        {
-            return BadRequest("El ID de la clase en la URL no coincide con el ID en el cuerpo de la solicitud.");
-        }
-
-        var clase = _claseService.Update(id, updatedClase);
-        if (clase is null)
-        {
-            return NotFound();
-        }
-        return CreatedAtAction(nameof(GetById), new { id = clase.Id }, clase);
+        bool deleted = _claseService.Delete(ClaseId);
+        if (deleted) return NoContent();
+        return NotFound();
     }
+
 }
