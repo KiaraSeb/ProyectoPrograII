@@ -2,25 +2,29 @@ using System.Text.Json.Serialization;
 
 public class Persona
 {
-    public int Id { get; set; }
+    public int PersonaId { get; set; }
     public string? Nombre { get; set; }
-    public string? Apellido { get; set; }
-    public string? Email { get; set; }
+    public bool EsLider { get; set; } // Propiedad EsLider
 
-    public Persona()
-    {
-    }
+    // Clave foránea
+    public int ClaseId { get; set; }
 
-    public Persona(int id, string nombre, string apellido, string email)
+    // Propiedad de navegación hacia la clase
+    [JsonIgnore]  
+    public virtual Clase? Clase { get; set; }
+
+    public Persona() { }
+
+    public Persona(int PersonaId, string nombre,  int claseId, bool esLider)
     {
-        Id = id;
+        PersonaId = PersonaId;
         Nombre = nombre;
-        Apellido = apellido;
-        Email = email;
+        ClaseId = claseId;
+        EsLider = esLider;
     }
 
     override public string ToString()
     {
-        return $"Id:{Id}, {Nombre} {Apellido}, Email:{Email}";
+        return $"PersonaId:{PersonaId}, {Nombre}, EsLider:{EsLider}, ClaseId:{ClaseId}";
     }
 }

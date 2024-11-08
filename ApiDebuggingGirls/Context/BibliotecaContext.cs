@@ -27,12 +27,6 @@ public class BibliotecaContext : DbContext
             entity.Property(p => p.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(p => p.Apellido)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(p => p.Email)
-                .IsRequired()
-                .HasMaxLength(100);
         });
 
         // Configuración para Especialidad

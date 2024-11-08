@@ -1,8 +1,8 @@
 public interface IPersonaService
 {
     IEnumerable<Persona> GetAll();
-    Persona? GetById(int id);
+    Persona? GetById(int PersonaId);
     Persona Create(PersonaDTO personaDto);
-    void Delete(int id);
-    Persona? Update(int id, Persona persona);
+    bool Delete(int PersonaId); // Cambiado de void a bool
+    Persona? Update(int PersonaId, PersonaDTO updatedPersonaDto);
 }

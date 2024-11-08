@@ -14,22 +14,20 @@ public class PersonaDbService : IPersonaService
         Persona persona = new()
         {
             Nombre = p.Nombre,
-            Apellido = p.Apellido,
-            Email = p.Email
         };
         _context.Personas.Add(persona);
         _context.SaveChanges();
         return persona;
     }
 
-    public void Delete(int id)
+    public bool Delete(int PersonaId) // Cambiado de void a bool
     {
-        var p = _context.Personas.Find(id);
-        if (p != null)
-        {
-            _context.Personas.Remove(p);
-            _context.SaveChanges();
-        }
+        var persona = _context.Personas.Find(PersonaId);
+        if (persona == null) return false;
+
+        _context.Personas.Remove(persona);
+        _context.SaveChanges();
+        return true;
     }
 
     public IEnumerable<Persona> GetAll()
@@ -37,15 +35,18 @@ public class PersonaDbService : IPersonaService
         return _context.Personas;
     }
 
-    public Persona? GetById(int id)
+    public Persona? GetById(int PersonaId)
     {
-        return _context.Personas.Find(id);
+        return _context.Personas.Find(PersonaId);
     }
 
-    public Persona? Update(int id, Persona p)
+    public Persona? Update(int PersonaId, PersonaDTO p)
     {
-        _context.Entry(p).State = EntityState.Modified;
+        var persona = _context.Personas.Find(PersonaId);
+        if (persona == null) return null;
+
+        persona.Nombre = p.Nombre;
         _context.SaveChanges();
-        return p;
+        return persona;
     }
 }

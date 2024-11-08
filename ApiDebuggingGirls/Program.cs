@@ -58,6 +58,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSqlServer<BibliotecaContext>(connectionString);
 
 // Registrar servicios de la aplicación
+builder.Services.AddScoped<IPersonaService, PersonaDbService>();
 builder.Services.AddScoped<IClaseService, ClaseDbService>();
 builder.Services.AddScoped<IEspecialidadService, EspecialidadDbService>();
 builder.Services.AddScoped<IUnidadService, UnidadDbService>();

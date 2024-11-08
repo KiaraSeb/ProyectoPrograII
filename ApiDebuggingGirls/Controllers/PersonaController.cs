@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 [ApiController]
 [Authorize]
 [Route("api/personas")]
-public class PersonaController : ControllerBase {
-
+public class PersonaController : ControllerBase
+{
     private readonly IPersonaService _personaService;
 
     public PersonaController(IPersonaService personaService)
@@ -19,51 +19,32 @@ public class PersonaController : ControllerBase {
         return Ok(_personaService.GetAll());
     }
 
-    [HttpGet("{id}")]
-    public ActionResult<Persona> GetById(int id)
+    [HttpGet("{PersonaId}")]
+    public ActionResult<Persona> GetById(int PersonaId)
     {
-        Persona? persona = _personaService.GetById(id);
-        if (persona == null)
-        {
-            return NotFound("Persona no encontrada.");
-        }
-
-        return Ok(persona);
+        var persona = _personaService.GetById(PersonaId);
+        return persona == null ? NotFound("Persona no encontrada.") : Ok(persona);
     }
 
     [HttpPost]
     public ActionResult<Persona> NuevaPersona(PersonaDTO personaDto)
     {
-        Persona nuevaPersona = _personaService.Create(personaDto);
-        return CreatedAtAction(nameof(GetById), new { id = nuevaPersona.Id }, nuevaPersona);
+        var nuevaPersona = _personaService.Create(personaDto);
+        return CreatedAtAction(nameof(GetById), new {PersonaId = nuevaPersona.PersonaId }, nuevaPersona);
     }
 
-    [HttpDelete("{id}")]
-    public ActionResult Delete(int id)
+    [HttpPut("{PersonaId}")]
+    public ActionResult<Persona> UpdatePersona(int PersonaId, PersonaDTO updatedPersonaDto)
     {
-        var persona = _personaService.GetById(id);
-        if (persona == null)
-        {
+        var personaActualizada = _personaService.Update(PersonaId, updatedPersonaDto);
+        return personaActualizada == null ? NotFound() : Ok(personaActualizada);
+    }
+
+    [HttpDelete("{PersonaId}")]
+    public ActionResult Delete(int PersonaId)
+    {
+        if (!_personaService.Delete(PersonaId))
             return NotFound("Persona no encontrada.");
-        }
-
-        _personaService.Delete(id);
         return NoContent();
-    }
-
-    [HttpPut("{id}")]
-    public ActionResult<Persona> UpdatePersona(int id, Persona updatedPersona)
-    {
-        if (id != updatedPersona.Id)
-        {
-            return BadRequest("El ID de la persona en la URL no coincide con el ID en el cuerpo de la solicitud.");
-        }
-
-        var persona = _personaService.Update(id, updatedPersona);
-        if (persona is null)
-        {
-            return NotFound();
-        }
-        return CreatedAtAction(nameof(GetById), new { id = persona.Id }, persona);
     }
 }
