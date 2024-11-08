@@ -33,13 +33,28 @@ public class PersonaController : ControllerBase
         return CreatedAtAction(nameof(GetById), new {PersonaId = nuevaPersona.PersonaId }, nuevaPersona);
     }
 
-    [HttpPut("{PersonaId}")]
-    public ActionResult<Persona> UpdatePersona(int PersonaId, PersonaDTO updatedPersonaDto)
+    [HttpPut("{personaId}")]
+    public IActionResult Update(int personaId, [FromBody] PersonaDTO personaDto)
     {
-        var personaActualizada = _personaService.Update(PersonaId, updatedPersonaDto);
-        return personaActualizada == null ? NotFound() : Ok(personaActualizada);
-    }
+        if (personaDto == null)
+        {
+            return BadRequest("El objeto persona no puede ser nulo.");
+        }
 
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var updatedPersona = _personaService.Update(personaId, personaDto);
+        if (updatedPersona == null)
+        {
+            return NotFound($"Persona con ID {personaId} no encontrada.");
+        }
+
+        return Ok(updatedPersona);
+    }
+    
     [HttpDelete("{PersonaId}")]
     public ActionResult Delete(int PersonaId)
     {
@@ -47,4 +62,5 @@ public class PersonaController : ControllerBase
             return NotFound("Persona no encontrada.");
         return NoContent();
     }
+
 }

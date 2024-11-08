@@ -9,18 +9,37 @@ public class PersonaDbService : IPersonaService
         _context = context;
     }
 
-    public Persona Create(PersonaDTO p)
+    public Persona Create(PersonaDTO personaDto)
+{
+    // Crea la persona
+    Persona persona = new()
     {
-        Persona persona = new()
+        Nombre = personaDto.Nombre,
+        EsLider = personaDto.EsLider,
+        ClaseId = personaDto.ClaseId
+    };
+
+    // Asociar las especialidades
+    foreach (var especialidadId in personaDto.EspecialidadIds)
+    {
+        var especialidad = _context.Especialidades.Find(especialidadId);
+        if (especialidad != null)
         {
-            Nombre = p.Nombre,
-        };
-        _context.Personas.Add(persona);
-        _context.SaveChanges();
-        return persona;
+            persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+            {
+                Persona = persona,
+                Especialidad = especialidad
+            });
+        }
     }
 
-    public bool Delete(int PersonaId) // Cambiado de void a bool
+    _context.Personas.Add(persona);
+    _context.SaveChanges();
+    return persona;
+}
+
+
+    public bool Delete(int PersonaId)
     {
         var persona = _context.Personas.Find(PersonaId);
         if (persona == null) return false;
@@ -40,13 +59,69 @@ public class PersonaDbService : IPersonaService
         return _context.Personas.Find(PersonaId);
     }
 
-    public Persona? Update(int PersonaId, PersonaDTO p)
+    public Persona Update(int personaId, PersonaDTO personaDto)
     {
-        var persona = _context.Personas.Find(PersonaId);
-        if (persona == null) return null;
+        var persona = _context.Personas.Include(p => p.PersonaEspecialidades)
+                                        .ThenInclude(pe => pe.Especialidad)
+                                        .FirstOrDefault(p => p.PersonaId == personaId);
 
-        persona.Nombre = p.Nombre;
+        if (persona == null)
+        {
+            return null; // O lanzar una excepción
+        }
+
+        // Actualizar propiedades
+        persona.Nombre = personaDto.Nombre;
+        persona.EsLider = personaDto.EsLider;
+        persona.ClaseId = personaDto.ClaseId;
+
+        // Limpiar las especialidades existentes
+        persona.PersonaEspecialidades.Clear();
+
+        // Agregar las nuevas especialidades
+        foreach (var especialidadId in personaDto.EspecialidadIds)
+        {
+            persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+            {
+                PersonaId = persona.PersonaId,
+                EspecialidadId = especialidadId
+            });
+        }
+
         _context.SaveChanges();
         return persona;
     }
+
+    public Persona? UpdateEspecialidades(int personaId, List<int> especialidadIds)
+    {
+        var persona = _context.Personas
+            .Include(p => p.PersonaEspecialidades)
+            .FirstOrDefault(p => p.PersonaId == personaId);
+
+        if (persona == null) return null;
+
+        // Elimina las asociaciones existentes
+        persona.PersonaEspecialidades.Clear();
+
+        // Agrega las nuevas asociaciones
+        foreach (var especialidadId in especialidadIds)
+        {
+            var especialidad = _context.Especialidades.Find(especialidadId);
+            if (especialidad != null)
+            {
+                persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+                {
+                    Persona = persona,
+                    Especialidad = especialidad
+                });
+            }
+        }
+
+        _context.SaveChanges();
+
+        // Retorna la persona actualizada con los IDs de las especialidades vinculadas
+        return persona;
+    }
+
+
 }

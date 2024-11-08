@@ -1,30 +1,17 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
+[Table("Personas")]
 public class Persona
 {
     public int PersonaId { get; set; }
     public string? Nombre { get; set; }
-    public bool EsLider { get; set; } // Propiedad EsLider
-
-    // Clave foránea
+    public bool EsLider { get; set; }
     public int ClaseId { get; set; }
 
-    // Propiedad de navegación hacia la clase
-    [JsonIgnore]  
+    [JsonIgnore]
     public virtual Clase? Clase { get; set; }
 
-    public Persona() { }
-
-    public Persona(int PersonaId, string nombre,  int claseId, bool esLider)
-    {
-        PersonaId = PersonaId;
-        Nombre = nombre;
-        ClaseId = claseId;
-        EsLider = esLider;
-    }
-
-    override public string ToString()
-    {
-        return $"PersonaId:{PersonaId}, {Nombre}, EsLider:{EsLider}, ClaseId:{ClaseId}";
-    }
+    // Relación con PersonaEspecialidad
+    public virtual List<PersonaEspecialidad> PersonaEspecialidades { get; set; } = new List<PersonaEspecialidad>();
 }
