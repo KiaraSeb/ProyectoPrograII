@@ -33,36 +33,4 @@ public class ClaseController : ControllerBase
         if (clase is null) return NotFound();
         return Ok(clase);
     }
-
-    [HttpPost]
-    public ActionResult<Clase> NuevaClase(ClaseDTO c)
-    {
-        Clase clase = _claseService.Create(c);
-        return CreatedAtAction(nameof(GetById), new { ClaseId = clase.ClaseId }, clase);
-    }
-
-    [HttpPut("{ClaseId}")]
-    public ActionResult<Clase> Update(int ClaseId, ClaseDTO c)
-    {
-        try
-        {
-            Clase clase = _claseService.Update(ClaseId, c);
-            if (clase is null) return NotFound(new { Message = $"No se pudo actualizar la clase con ClaseId: {ClaseId}" });
-            return CreatedAtAction(nameof(GetById), new { ClaseId = clase.ClaseId }, clase);
-        }
-        catch (System.Exception e)
-        {
-            Console.WriteLine(e.Message);
-            return Problem(detail: e.Message, statusCode: 500);
-        }
-    }
-
-    [HttpDelete("{ClaseId}")]
-    public ActionResult Delete(int ClaseId)
-    {
-        bool deleted = _claseService.Delete(ClaseId);
-        if (deleted) return NoContent();
-        return NotFound();
-    }
-
 }

@@ -1,15 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Authorize]
 [Route("api/unidades")]
 public class UnidadController : ControllerBase
 {
+    private readonly BibliotecaContext _context;
     private readonly IUnidadService _unidadService;
 
-    public UnidadController(IUnidadService unidadService)
+    // Constructor único que recibe ambas dependencias
+    public UnidadController(BibliotecaContext context, IUnidadService unidadService)
     {
+        _context = context;
         _unidadService = unidadService;
     }
 
@@ -34,10 +38,20 @@ public class UnidadController : ControllerBase
     }
 
     [HttpPut("{UnidadId}")]
-    public ActionResult<Unidad> UpdateUnidad(int UnidadId, UnidadDTO updatedUnidad)
+    public Unidad? Update(int UnidadId, UnidadDTO updatedUnidadDto)
     {
-        var unidad = _unidadService.Update(UnidadId, updatedUnidad);
-        return unidad == null ? NotFound() : CreatedAtAction(nameof(GetById), new { UnidadId = unidad.UnidadId }, unidad);
+        var existingUnidad = _context.Unidades.Include(u => u.Clase).FirstOrDefault(u => u.UnidadId == UnidadId);
+        if (existingUnidad == null)
+        {
+            return null; // Unidad no encontrada
+        }
+
+        // Asignar los valores desde el DTO
+        existingUnidad.Nombre = updatedUnidadDto.Nombre;
+        existingUnidad.ClaseId = updatedUnidadDto.ClaseId;
+
+        _context.SaveChanges();
+        return existingUnidad; // La unidad devuelta ya incluirá la clase asociada
     }
 
     [HttpDelete("{UnidadId}")]
@@ -49,7 +63,4 @@ public class UnidadController : ControllerBase
         }
         return NoContent();
     }
-
 }
-
-

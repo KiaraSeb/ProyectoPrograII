@@ -49,13 +49,23 @@ public class EspecialidadController : ControllerBase
 
     [HttpPut("{EspecialidadId}")]
     [Authorize]
-    public IActionResult UpdateEspecialidad(int EspecialidadId, [FromBody] Especialidad especialidad)
+    public IActionResult UpdateEspecialidad(int EspecialidadId, [FromBody] EspecialidadDTO especialidadDto)
     {
+        // Convertir EspecialidadDTO a Especialidad
+        var especialidad = new Especialidad
+        {
+            EspecialidadId = EspecialidadId,
+            Nombre = especialidadDto.Nombre,  // Aquí debes asignar las propiedades relevantes
+            // Asignar otras propiedades si las hay
+        };
+
         var updatedEspecialidad = _especialidadService.Update(EspecialidadId, especialidad);
+
         if (updatedEspecialidad == null)
         {
             return NotFound();
         }
+
         return Ok(updatedEspecialidad);
     }
 }

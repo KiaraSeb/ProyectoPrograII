@@ -42,12 +42,30 @@ public class EspecialidadDbService : IEspecialidadService
         }
     }
 
-    public Especialidad? Update(int EspecialidadId, Especialidad especialidad) 
+    // Implementación del método Update utilizando Especialidad en lugar de EspecialidadDTO
+    // En EspecialidadDbService
+public Especialidad Update(int EspecialidadId, Especialidad especialidad)
+{
+    if (EspecialidadId != especialidad.EspecialidadId)
     {
-        if (EspecialidadId != especialidad.EspecialidadId) return null;
-
-        _dbContext.Entry(especialidad).State = EntityState.Modified;
-        _dbContext.SaveChanges();
-        return especialidad;
+        throw new ArgumentException("Los IDs no coinciden");
     }
+
+    var existingEspecialidad = _dbContext.Especialidades
+        .FirstOrDefault(e => e.EspecialidadId == EspecialidadId);
+
+    if (existingEspecialidad == null)
+    {
+        throw new KeyNotFoundException("Especialidad no encontrada");
+    }
+
+    existingEspecialidad.Nombre = especialidad.Nombre; // O cualquier otro campo que quieras actualizar
+    _dbContext.SaveChanges();
+
+    return existingEspecialidad;
+}
+
+
+
+
 }

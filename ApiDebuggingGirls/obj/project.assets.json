@@ -4384,19 +4384,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Usuario\\.nuget\\packages\\": {}
+    "C:\\Users\\Tania\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Usuario\\OneDrive - uap.edu.ar\\Escritorio\\ProyectoPrograII\\ApiDebuggingGirls\\ApiDebuggingGirls.csproj",
+      "projectUniqueName": "D:\\A_UAP\\Materias 4° cuatri\\Programación II\\proyecto progra 2\\ProyectoPrograII\\ApiDebuggingGirls\\ApiDebuggingGirls.csproj",
       "projectName": "ApiDebuggingGirls",
-      "projectPath": "C:\\Users\\Usuario\\OneDrive - uap.edu.ar\\Escritorio\\ProyectoPrograII\\ApiDebuggingGirls\\ApiDebuggingGirls.csproj",
-      "packagesPath": "C:\\Users\\Usuario\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Usuario\\OneDrive - uap.edu.ar\\Escritorio\\ProyectoPrograII\\ApiDebuggingGirls\\obj\\",
+      "projectPath": "D:\\A_UAP\\Materias 4° cuatri\\Programación II\\proyecto progra 2\\ProyectoPrograII\\ApiDebuggingGirls\\ApiDebuggingGirls.csproj",
+      "packagesPath": "C:\\Users\\Tania\\.nuget\\packages\\",
+      "outputPath": "D:\\A_UAP\\Materias 4° cuatri\\Programación II\\proyecto progra 2\\ProyectoPrograII\\ApiDebuggingGirls\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Usuario\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\Tania\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -4481,7 +4481,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.306/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

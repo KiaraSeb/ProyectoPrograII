@@ -8,6 +8,15 @@ using Microsoft.OpenApi.Models;
 // Cargar las variables de entorno desde el archivo .env
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
+if (File.Exists(dotenv))
+{
+    DotEnv.Load(dotenv);
+}
+else
+{
+    Console.WriteLine("El archivo .env no fue encontrado.");
+}
+
 DotEnv.Load(dotenv);
 
 var builder = WebApplication.CreateBuilder(args);
