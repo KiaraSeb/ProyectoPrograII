@@ -48,24 +48,27 @@ public class EspecialidadController : ControllerBase
     }
 
     [HttpPut("{EspecialidadId}")]
-    [Authorize]
-    public IActionResult UpdateEspecialidad(int EspecialidadId, [FromBody] EspecialidadDTO especialidadDto)
+[Authorize]
+public IActionResult UpdateEspecialidad(int EspecialidadId, [FromBody] EspecialidadDTO especialidadDto)
+{
+    var existingEspecialidad = _especialidadService.GetById(EspecialidadId);
+    if (existingEspecialidad == null)
     {
-        // Convertir EspecialidadDTO a Especialidad
-        var especialidad = new Especialidad
-        {
-            EspecialidadId = EspecialidadId,
-            Nombre = especialidadDto.Nombre,  // Aquí debes asignar las propiedades relevantes
-            // Asignar otras propiedades si las hay
-        };
-
-        var updatedEspecialidad = _especialidadService.Update(EspecialidadId, especialidad);
-
-        if (updatedEspecialidad == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(updatedEspecialidad);
+        return NotFound();
     }
+
+    // Actualiza las propiedades que realmente quieres cambiar
+    existingEspecialidad.Nombre = especialidadDto.Nombre;
+    existingEspecialidad.Tipo = especialidadDto.Tipo;  // Asegúrate de que el tipo se actualice
+
+    var updatedEspecialidad = _especialidadService.Update(EspecialidadId, existingEspecialidad);
+
+    if (updatedEspecialidad == null)
+    {
+        return NotFound();
+    }
+
+    return Ok(updatedEspecialidad);
+}
+
 }

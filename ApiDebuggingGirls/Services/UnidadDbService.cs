@@ -47,15 +47,21 @@ public class UnidadDbService : IUnidadService
 
     // Obtener todas las Unidades, incluyendo las clases asociadas
     public IEnumerable<Unidad> GetAll()
-    {
-        return _context.Unidades.Include(u => u.Clase).ToList(); // Cargar también la Clase asociada
-    }
+{
+    return _context.Unidades
+        .Include(u => u.Clase)  // Incluye la clase asociada
+        .Include(u => u.Personas)  // Incluye las personas asociadas a la unidad
+        .ToList();
+}
 
-    // Obtener una Unidad por su ID, incluyendo la Clase asociada
-    public Unidad? GetById(int UnidadId)
-    {
-        return _context.Unidades.Include(u => u.Clase).FirstOrDefault(u => u.UnidadId == UnidadId); // Cargar la Clase asociada
-    }
+public Unidad? GetById(int UnidadId)
+{
+    return _context.Unidades
+        .Include(u => u.Clase)
+        .Include(u => u.Personas)  // Incluye las personas asociadas
+        .FirstOrDefault(u => u.UnidadId == UnidadId);
+}
+
 
     // Actualizar una Unidad
     public Unidad? Update(int UnidadId, UnidadDTO updatedUnidadDto)

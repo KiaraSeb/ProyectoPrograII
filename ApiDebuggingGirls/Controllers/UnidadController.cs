@@ -18,10 +18,50 @@ public class UnidadController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Unidad>> GetAllUnidades()
+public ActionResult<List<object>> GetAllUnidades()
+{
+    var unidades = _unidadService.GetAll();  // Recuperamos todas las unidades
+
+    if (unidades == null || !unidades.Any())
     {
-        return Ok(_unidadService.GetAll());
+        return NotFound("No hay unidades registradas.");
     }
+
+    var resultado = unidades.Select(unidad => new
+    {
+        UnidadId = unidad.UnidadId,
+        Nombre = unidad.Nombre,
+        ClaseId = unidad.ClaseId,
+        ClaseNombre = unidad.Clase?.Nombre // Solo el nombre de la clase, sin personas
+    }).ToList();
+
+    return Ok(resultado);  // Regresamos las unidades con sus clases, sin personas
+}
+
+[HttpGet("con-personas")]
+public ActionResult<List<object>> GetUnidadesConPersonas()
+{
+    var unidades = _unidadService.GetAll();  // Recuperamos todas las unidades
+
+    if (unidades == null || !unidades.Any())
+    {
+        return NotFound("No hay unidades registradas.");
+    }
+
+    var resultado = unidades.Select(unidad => new
+    {
+        UnidadId = unidad.UnidadId,
+        Nombre = unidad.Nombre,
+        ClaseId = unidad.ClaseId,
+        ClaseNombre = unidad.Clase?.Nombre, // Solo el nombre de la clase
+        Lideres = unidad.Lideres,           // Aquí incluyen los líderes
+        Conquistadores = unidad.Conquistadores  // Aquí incluyen los conquistadores
+    }).ToList();
+
+    return Ok(resultado);  // Regresamos las unidades con sus personas
+}
+
+
 
     [HttpGet("{UnidadId}")]
     public ActionResult<Unidad> GetById(int UnidadId)

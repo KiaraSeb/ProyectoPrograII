@@ -10,9 +10,6 @@ public class PersonaDTO
     [Required(ErrorMessage = "El campo EsLider es requerido.")]
     public bool EsLider { get; set; }
 
-    [Required(ErrorMessage = "El campo ClaseId es requerido.")]
-    public int ClaseId { get; set; }
-
-    // Lista de IDs de especialidades
-    public List<int> EspecialidadIds { get; set; } = new List<int>();
+    [Required(ErrorMessage = "El campo UnidadId es requerido.")]
+    public int UnidadId { get; set; }
 }

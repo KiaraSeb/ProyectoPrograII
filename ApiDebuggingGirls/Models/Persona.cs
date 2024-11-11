@@ -7,11 +7,9 @@ public class Persona
     public int PersonaId { get; set; }
     public string? Nombre { get; set; }
     public bool EsLider { get; set; }
-    public int ClaseId { get; set; }
+
+    public int UnidadId { get; set; }
 
     [JsonIgnore]
-    public virtual Clase? Clase { get; set; }
-
-    // Relación con PersonaEspecialidad
-    public virtual List<PersonaEspecialidad> PersonaEspecialidades { get; set; } = new List<PersonaEspecialidad>();
+    public virtual Unidad? Unidad { get; set; } // Relación con la unidad
 }
