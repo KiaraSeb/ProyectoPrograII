@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 [ApiController]
 [Authorize]
@@ -7,10 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 public class PersonaController : ControllerBase
 {
     private readonly IPersonaService _personaService;
+    private readonly IEspecialidadService _especialidadService; // Inyección del servicio de especialidad.
 
-    public PersonaController(IPersonaService personaService)
+    public PersonaController(IPersonaService personaService, IEspecialidadService especialidadService)
     {
         _personaService = personaService;
+        _especialidadService = especialidadService; // Asignación del servicio de especialidad.
     }
 
     [HttpGet]
@@ -30,7 +33,7 @@ public class PersonaController : ControllerBase
     public ActionResult<Persona> NuevaPersona(PersonaDTO personaDto)
     {
         var nuevaPersona = _personaService.Create(personaDto);
-        return CreatedAtAction(nameof(GetById), new {PersonaId = nuevaPersona.PersonaId }, nuevaPersona);
+        return CreatedAtAction(nameof(GetById), new { PersonaId = nuevaPersona.PersonaId }, nuevaPersona);
     }
 
     [HttpPut("{personaId}")]
@@ -52,9 +55,32 @@ public class PersonaController : ControllerBase
             return NotFound($"Persona con ID {personaId} no encontrada.");
         }
 
+        var persona = _personaService.GetById(personaId);
+        if (persona == null)
+        {
+            return NotFound($"Persona con ID {personaId} no encontrada.");
+        }
+
+        persona.PersonaEspecialidades.Clear();
+
+        foreach (var especialidadId in personaDto.EspecialidadIds)
+        {
+            var especialidad = _especialidadService.GetById(especialidadId);
+            if (especialidad != null)
+            {
+                persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+                {
+                    PersonaId = persona.PersonaId,
+                    EspecialidadId = especialidad.EspecialidadId
+                });
+            }
+        }
+
+        _personaService.Save(); // Verifica que este método esté implementado.
+
         return Ok(updatedPersona);
     }
-    
+
     [HttpDelete("{PersonaId}")]
     public ActionResult Delete(int PersonaId)
     {
@@ -62,5 +88,4 @@ public class PersonaController : ControllerBase
             return NotFound("Persona no encontrada.");
         return NoContent();
     }
-
 }

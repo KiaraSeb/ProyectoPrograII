@@ -6,6 +6,6 @@ public interface IPersonaService
     bool Delete(int PersonaId);
     Persona? Update(int PersonaId, PersonaDTO updatedPersonaDto);
 
-    // Nueva firma del método para actualizar especialidades de una persona
-    Persona? UpdateEspecialidades(int personaId, List<int> especialidadIds);
+    // Método para guardar cambios en el servicio.
+    void Save();
 }

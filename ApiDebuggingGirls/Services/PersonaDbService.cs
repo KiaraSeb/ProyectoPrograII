@@ -10,34 +10,33 @@ public class PersonaDbService : IPersonaService
     }
 
     public Persona Create(PersonaDTO personaDto)
-{
-    // Crea la persona
-    Persona persona = new()
     {
-        Nombre = personaDto.Nombre,
-        EsLider = personaDto.EsLider,
-        ClaseId = personaDto.ClaseId
-    };
-
-    // Asociar las especialidades
-    foreach (var especialidadId in personaDto.EspecialidadIds)
-    {
-        var especialidad = _context.Especialidades.Find(especialidadId);
-        if (especialidad != null)
+        // Crea la persona
+        Persona persona = new()
         {
-            persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+            Nombre = personaDto.Nombre,
+            EsLider = personaDto.EsLider,
+            ClaseId = personaDto.ClaseId
+        };
+
+        // Asociar las especialidades
+        foreach (var especialidadId in personaDto.EspecialidadIds)
+        {
+            var especialidad = _context.Especialidades.Find(especialidadId);
+            if (especialidad != null)
             {
-                Persona = persona,
-                Especialidad = especialidad
-            });
+                persona.PersonaEspecialidades.Add(new PersonaEspecialidad
+                {
+                    Persona = persona,
+                    Especialidad = especialidad
+                });
+            }
         }
+
+        _context.Personas.Add(persona);
+        _context.SaveChanges();
+        return persona;
     }
-
-    _context.Personas.Add(persona);
-    _context.SaveChanges();
-    return persona;
-}
-
 
     public bool Delete(int PersonaId)
     {
@@ -123,5 +122,9 @@ public class PersonaDbService : IPersonaService
         return persona;
     }
 
-
+    // Implementación del método Save
+    public void Save()
+    {
+        _context.SaveChanges();
+    }
 }

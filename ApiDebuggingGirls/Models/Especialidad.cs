@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 public class Especialidad
@@ -7,6 +8,7 @@ public class Especialidad
     public string? Nombre { get; set; }
     public string? Tipo { get; set; }
 
-    // Relación con PersonaEspecialidad
-    public virtual List<PersonaEspecialidad> PersonaEspecialidades { get; set; } = new List<PersonaEspecialidad>();
+    // Relación con PersonaEspecialidad.
+    [JsonIgnore]
+    public ICollection<PersonaEspecialidad> PersonaEspecialidades { get; set; } = new List<PersonaEspecialidad>();
 }
